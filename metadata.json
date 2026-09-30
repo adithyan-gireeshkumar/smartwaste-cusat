@@ -1,0 +1,6 @@
+{
+  "name": "SmartWaste CUSAT",
+  "description": "Smart Waste Management & Reporting Platform for Cochin University of Science and Technology (CUSAT), Kochi, Kerala. Real-time IoT bin monitoring, campus mapping, telemetry thresholds, and collection workflows.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
