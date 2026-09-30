@@ -2,12 +2,10 @@ import express from 'express';
 import type { Request, Response } from 'express';
 import http from 'node:http';
 import path from 'path';
-import { fileURLToPath } from 'url';
-import { createServer as createViteServer } from 'vite';
 import { WebSocketServer, WebSocket } from 'ws';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+// Resolve static assets from the project root (works for both ESM dev and bundled CJS functions).
+const projectRoot = process.cwd();
 
 const isProduction = process.env.NODE_ENV === 'production';
 const PORT = process.env.PORT ? parseInt(process.env.PORT, 10) : 3000;
@@ -1427,15 +1425,18 @@ async function startServer() {
 
   // Serve the Vite app locally and from the standalone Node server.
   if (!isProduction) {
+    // Load Vite lazily via a non-literal specifier so it is never bundled into the Netlify Function.
+    const viteModule = 'vite';
+    const { createServer: createViteServer } = await import(viteModule);
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: 'spa',
     });
     app.use(vite.middlewares);
   } else {
-    app.use(express.static(path.resolve(__dirname, 'dist')));
+    app.use(express.static(path.resolve(projectRoot, 'dist')));
     app.get('*', (_req, res) => {
-      res.sendFile(path.resolve(__dirname, 'dist', 'index.html'));
+      res.sendFile(path.resolve(projectRoot, 'dist', 'index.html'));
     });
   }
 
