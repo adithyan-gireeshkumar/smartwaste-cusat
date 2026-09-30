@@ -13,7 +13,8 @@ import {
   ExternalLink,
   ChevronDown,
   Sparkles,
-  RefreshCw
+  RefreshCw,
+  Calendar
 } from 'lucide-react';
 import { useEco } from '../state/EcoContext';
 
@@ -38,7 +39,13 @@ export const EcoHeader: React.FC<EcoHeaderProps> = ({ onToggleMobileMenu, onSwit
   } = useEco();
 
   const [bellOpen, setBellOpen] = useState(false);
+  const [currentDate, setCurrentDate] = useState(() => new Date());
   const bellRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const clock = window.setInterval(() => setCurrentDate(new Date()), 1000);
+    return () => window.clearInterval(clock);
+  }, []);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -102,6 +109,25 @@ export const EcoHeader: React.FC<EcoHeaderProps> = ({ onToggleMobileMenu, onSwit
 
       {/* Right: Actions, Notification Bell, Admin Profile, Version Switcher */}
       <div className="flex items-center gap-2 sm:gap-3">
+        <div
+          className="flex items-center gap-2 px-2 py-1.5 sm:px-2.5 bg-[#f4f8f3] border border-[#d3e2d5] rounded-xl text-[#1b4332]"
+          aria-live="polite"
+          aria-label={`Current local date and time: ${currentDate.toLocaleString()}`}
+        >
+          <Calendar className="w-4 h-4 text-[#2d6a4f] shrink-0" />
+          <div className="hidden sm:block leading-tight">
+            <div className="text-[10px] font-medium text-[#52796f]">
+              {currentDate.toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' })}
+            </div>
+            <div className="text-xs font-mono font-bold tabular-nums">
+              {currentDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
+            </div>
+          </div>
+          <span className="sm:hidden text-[10px] font-mono font-bold tabular-nums">
+            {currentDate.toLocaleTimeString(undefined, { hour: '2-digit', minute: '2-digit' })}
+          </span>
+        </div>
+
         {/* Switcher to Classic Dark Mode (Preserves existing project!) */}
         <button
           onClick={onSwitchToClassic}

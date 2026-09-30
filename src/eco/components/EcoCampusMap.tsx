@@ -46,20 +46,19 @@ export const EcoCampusMap: React.FC<EcoCampusMapProps> = ({
     if (!mapInstanceRef.current) {
       const map = L.map(mapContainerRef.current, {
         center: [10.0442, 76.3275],
-        zoom: 16,
-        minZoom: 15,
+        zoom: 15,
+        minZoom: 14,
         maxZoom: 18,
         zoomControl: false,
       });
 
       L.control.zoom({ position: 'bottomright' }).addTo(map);
+      L.control.scale({ position: 'bottomleft', imperial: false }).addTo(map);
 
-      // Light Eco-tile style using CartoDB Voyager
       L.tileLayer(
-        'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png',
+        'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
         {
-          attribution: '&copy; <a href="https://carto.com/">CARTO</a> &copy; OpenStreetMap',
-          subdomains: 'abcd',
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
           maxZoom: 19,
         }
       ).addTo(map);
@@ -164,6 +163,13 @@ export const EcoCampusMap: React.FC<EcoCampusMapProps> = ({
 
       markersRef.current.push(marker);
     });
+
+    if (locations.length > 0) {
+      map.fitBounds(
+        L.latLngBounds(locations.map((loc) => [loc.latitude, loc.longitude] as [number, number])),
+        { padding: [28, 28], maxZoom: 16 }
+      );
+    }
   }, [locations, bins, onSelectLocation, setSelectedLocation]);
 
   return (
