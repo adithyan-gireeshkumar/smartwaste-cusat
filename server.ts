@@ -759,7 +759,7 @@ function processTelemetryReading(
   return { bin, alertCreated };
 }
 
-async function startServer() {
+export async function createApiApp() {
   const app = express();
   app.use(express.json());
 
@@ -1419,7 +1419,13 @@ async function startServer() {
     res.json({ success: true, log: newLog });
   });
 
-  // 12. Mount Vite middleware or static
+  return app;
+}
+
+async function startServer() {
+  const app = await createApiApp();
+
+  // Serve the Vite app locally and from the standalone Node server.
   if (!isProduction) {
     const vite = await createViteServer({
       server: { middlewareMode: true },
@@ -1469,6 +1475,8 @@ async function startServer() {
   });
 }
 
-startServer().catch((err) => {
-  console.error('[SmartWaste CUSAT] Failed to start server:', err);
-});
+if (process.env.NETLIFY !== 'true') {
+  startServer().catch((err) => {
+    console.error('[SmartWaste CUSAT] Failed to start server:', err);
+  });
+}
